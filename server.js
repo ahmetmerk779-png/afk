@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
     }
 
     const connectBot = () => {
-      socket.emit('bot-log', { id, message: `${username} -> ${host}:${port} sunucusuna bağlanıyor...` });
+      socket.emit('bot-log', { id, message: `${username} -> ${host}:${port} sunucusuna bağlanıyor... (Sürüm: ${version || 'Otomatik'})` });
 
       try {
         const client = mc.createClient({
@@ -32,7 +32,8 @@ io.on('connection', (socket) => {
           port: parseInt(port) || 25565,
           username: username,
           version: version || false,
-          auth: 'offline'
+          auth: 'offline',
+          skipValidation: true
         });
 
         const startTime = bots[id] && bots[id].startTime ? bots[id].startTime : Date.now();
@@ -46,13 +47,23 @@ io.on('connection', (socket) => {
           scoreboard: { title: 'Skorbord', items: [] },
           scoresMap: {},
           antiAfkInterval: null,
-          reconnectTimer: null
+          reconnectTimer: null,
+          connectTimeout: null
         };
 
         io.emit('bot-status', { id, status: 'Bağlanıyor' });
         updateBotCounts();
 
+        // 15 saniye içinde spawn olmazsa bağlantıyı kopar ve yeniden dene
+        bots[id].connectTimeout = setTimeout(() => {
+          if (bots[id] && bots[id].status === 'Bağlanıyor') {
+            io.emit('bot-log', { id, message: 'Bağlantı zaman aşımına uğradı (Sunucu yanıt vermedi).' });
+            try { client.end('Timeout'); } catch(e){}
+          }
+        }, 15000);
+
         client.on('spawn', () => {
+          if (bots[id] && bots[id].connectTimeout) clearTimeout(bots[id].connectTimeout);
           bots[id].status = 'Oyunda';
           io.emit('bot-status', { id, status: 'Oyunda' });
           io.emit('bot-log', { id, message: 'Oyuna başarıyla giriş yapıldı.' });
@@ -79,7 +90,6 @@ io.on('connection', (socket) => {
         });
 
         client.on('packet', (data, meta) => {
-          // Koordinat ve Yön (Radar için)
           if (meta.name === 'position' || meta.name === 'player_position_and_look') {
             if (data.x !== undefined && data.z !== undefined) {
               bots[id].position = { 
@@ -91,14 +101,12 @@ io.on('connection', (socket) => {
               io.emit('bot-radar', { id, position: bots[id].position });
             }
           }
-          // Scoreboard Başlığı
           if (meta.name === 'scoreboard_objective') {
             if (data.action === 0 || data.action === undefined) {
               bots[id].scoreboard.title = data.displayText || data.name || 'Skorbord';
               io.emit('bot-scoreboard', { id, scoreboard: bots[id].scoreboard });
             }
           }
-          // Scoreboard Satırları
           if (meta.name === 'update_score' || meta.name === 'scoreboard_score') {
             const itemName = data.itemName || data.scoreName;
             const scoreVal = data.value || data.score;
@@ -113,10 +121,12 @@ io.on('connection', (socket) => {
         });
 
         client.on('error', (err) => {
-          io.emit('bot-log', { id, message: `Hata: ${err.message}` });
+          if (bots[id] && bots[id].connectTimeout) clearTimeout(bots[id].connectTimeout);
+          io.emit('bot-log', { id, message: `Bağlantı Hatası: ${err.message}` });
         });
 
         client.on('end', (reason) => {
+          if (bots[id] && bots[id].connectTimeout) clearTimeout(bots[id].connectTimeout);
           bots[id].status = 'Bağlantı Kesildi';
           io.emit('bot-status', { id, status: 'Bağlantı Kesildi' });
           io.emit('bot-log', { id, message: `Bağlantı koptu: ${reason}` });
@@ -143,6 +153,7 @@ io.on('connection', (socket) => {
   socket.on('stop-bot', (id) => {
     if (bots[id]) {
       if (bots[id].reconnectTimer) clearTimeout(bots[id].reconnectTimer);
+      if (bots[id].connectTimeout) clearTimeout(bots[id].connectTimeout);
       if (bots[id].antiAfkInterval) clearInterval(bots[id].antiAfkInterval);
       try { bots[id].client.end('Durduruldu'); } catch (e) {}
       delete bots[id];
@@ -152,7 +163,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Terminalden komut/chat gönderme
   socket.on('send-command', ({ id, command }) => {
     if (bots[id] && bots[id].client && bots[id].status === 'Oyunda') {
       try {
