@@ -1,0 +1,14 @@
+{
+  "name": "mc-afk-panel",
+  "version": "1.0.0",
+  "description": "Minecraft Çoklu AFK Bot Paneli",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "minecraft-protocol": "^1.45.0",
+    "socket.io": "^4.7.5"
+  }
+}
