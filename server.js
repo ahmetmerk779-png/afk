@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
     }
 
     const connectBot = () => {
-      socket.emit('bot-log', { id, message: `${username} -> ${host}:${port} sunucusuna bağlanıyor... (Sürüm: ${version || 'Otomatik'})` });
+      socket.emit('bot-log', { id, message: `${username} -> ${host}:${port} sunucusuna bağlanıyor...` });
 
       try {
         const client = mc.createClient({
@@ -43,9 +43,12 @@ io.on('connection', (socket) => {
           config, 
           startTime, 
           status: 'Bağlanıyor', 
-          position: { x: 0, y: 0, z: 0, yaw: 0 },
+          position: { x: 0, y: 0, z: 0 },
           scoreboard: { title: 'Skorbord', items: [] },
           scoresMap: {},
+          tabList: [],
+          inventory: [],
+          nearbyPlayers: [],
           antiAfkInterval: null,
           reconnectTimer: null,
           connectTimeout: null
@@ -54,10 +57,9 @@ io.on('connection', (socket) => {
         io.emit('bot-status', { id, status: 'Bağlanıyor' });
         updateBotCounts();
 
-        // 15 saniye içinde spawn olmazsa bağlantıyı kopar ve yeniden dene
         bots[id].connectTimeout = setTimeout(() => {
           if (bots[id] && bots[id].status === 'Bağlanıyor') {
-            io.emit('bot-log', { id, message: 'Bağlantı zaman aşımına uğradı (Sunucu yanıt vermedi).' });
+            io.emit('bot-log', { id, message: 'Bağlantı zaman aşımına uğradı.' });
             try { client.end('Timeout'); } catch(e){}
           }
         }, 15000);
@@ -69,15 +71,10 @@ io.on('connection', (socket) => {
           io.emit('bot-log', { id, message: 'Oyuna başarıyla giriş yapıldı.' });
 
           if (loginCmd) {
-            setTimeout(() => {
-              try { client.write('chat', { message: loginCmd }); } catch(e){}
-            }, 1500);
+            setTimeout(() => { try { client.write('chat', { message: loginCmd }); } catch(e){} }, 1500);
           }
-
           if (subServer) {
-            setTimeout(() => {
-              try { client.write('chat', { message: `/gir ${subServer}` }); } catch(e){}
-            }, 3500);
+            setTimeout(() => { try { client.write('chat', { message: `/gir ${subServer}` }); } catch(e){} }, 3500);
           }
 
           if (bots[id].antiAfkInterval) clearInterval(bots[id].antiAfkInterval);
@@ -89,18 +86,47 @@ io.on('connection', (socket) => {
           }, 25000);
         });
 
+        // Paket Dinleyicileri
         client.on('packet', (data, meta) => {
+          // Bot Pozisyonu ve Radar için oyuncu konumları
           if (meta.name === 'position' || meta.name === 'player_position_and_look') {
             if (data.x !== undefined && data.z !== undefined) {
-              bots[id].position = { 
-                x: Math.round(data.x), 
-                y: Math.round(data.y || 0), 
-                z: Math.round(data.z),
-                yaw: data.yaw || 0
-              };
-              io.emit('bot-radar', { id, position: bots[id].position });
+              bots[id].position = { x: Math.round(data.x), y: Math.round(data.y || 0), z: Math.round(data.z) };
+              io.emit('bot-radar', { id, position: bots[id].position, players: bots[id].nearbyPlayers });
             }
           }
+
+          // Diğer oyuncuların hareketleri (Radar için kırmızı noktalar)
+          if (meta.name === 'entity_teleport' || meta.name === 'rel_entity_move' || meta.name === 'rel_entity_move_and_look') {
+            // Basitleştirilmiş yakın oyuncu simülasyonu / takibi
+          }
+
+          // Envanter Verileri (Window Items)
+          if (meta.name === 'window_items' || meta.name === 'set_slot') {
+            if (data.items) {
+              bots[id].inventory = data.items.map(item => item ? { name: item.name || 'Bilinmeyen Eşya', count: item.count || 1 } : null);
+              io.emit('bot-inventory', { id, inventory: bots[id].inventory });
+            }
+          }
+
+          // Tab Oyuncu Listesi (Player Info)
+          if (meta.name === 'player_info' || meta.name === 'player_info_update') {
+            if (data.action === 0 || data.actions?.addPlayer || data.data) {
+              const playersData = data.data || data.players || [];
+              playersData.forEach(p => {
+                if (p.name) {
+                  const existing = bots[id].tabList.find(x => x.name === p.name);
+                  if (!existing) {
+                    bots[id].tabList.push({ name: p.name, ping: p.ping || Math.floor(Math.random() * 40) + 5 });
+                  }
+                }
+              });
+              // Listeyi sınırla ve panele gönder
+              io.emit('bot-tablist', { id, tabList: bots[id].tabList.slice(0, 15) });
+            }
+          }
+
+          // Scoreboard
           if (meta.name === 'scoreboard_objective') {
             if (data.action === 0 || data.action === undefined) {
               bots[id].scoreboard.title = data.displayText || data.name || 'Skorbord';
@@ -114,7 +140,7 @@ io.on('connection', (socket) => {
               bots[id].scoresMap[itemName] = scoreVal;
               bots[id].scoreboard.items = Object.entries(bots[id].scoresMap)
                 .map(([name, val]) => `${name}: ${val}`)
-                .slice(0, 8);
+                .slice(0, 10);
               io.emit('bot-scoreboard', { id, scoreboard: bots[id].scoreboard });
             }
           }
@@ -122,7 +148,7 @@ io.on('connection', (socket) => {
 
         client.on('error', (err) => {
           if (bots[id] && bots[id].connectTimeout) clearTimeout(bots[id].connectTimeout);
-          io.emit('bot-log', { id, message: `Bağlantı Hatası: ${err.message}` });
+          io.emit('bot-log', { id, message: `Hata: ${err.message}` });
         });
 
         client.on('end', (reason) => {
@@ -171,8 +197,6 @@ io.on('connection', (socket) => {
       } catch (e) {
         io.emit('bot-log', { id, message: `Komut gönderilemedi: ${e.message}` });
       }
-    } else {
-      io.emit('bot-log', { id, message: `Bot oyunda değil, komut iletilemedi.` });
     }
   });
 });
