@@ -7,80 +7,106 @@
     <script src="/socket.io/socket.io.js"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
+            --bg-color: #0b0f19;
+            --card-bg: #131b2e;
             --accent: #3b82f6;
             --accent-hover: #2563eb;
             --danger: #ef4444;
             --success: #22c55e;
             --text: #f8fafc;
             --text-muted: #94a3b8;
-            --border: #334155;
+            --border: #1e293b;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text); margin: 0; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 25px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 25px; }
-        h1 { margin: 0; font-size: 1.5rem; color: #60a5fa; }
-        .badge { background: #334155; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-        .main-layout { display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start; }
-        @media(max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text); margin: 0; padding: 15px; }
+        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 1.3rem; color: #60a5fa; }
+        .badge { background: #1e293b; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid #334155; }
         
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); margin-bottom: 20px; }
-        .card h3 { margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        input, select { width: 100%; padding: 10px; margin: 6px 0; background: #0f172a; border: 1px solid var(--border); border-radius: 6px; color: var(--text); box-sizing: border-box; }
-        .checkbox-group { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.9rem; color: var(--text-muted); }
+        .btn-add { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
+        .btn-add:hover { background: #16a34a; }
+
+        /* Modal Ekranı */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px; box-sizing: border-box; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+        .modal-content h3 { margin-top: 0; color: #60a5fa; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        input { width: 100%; padding: 10px; margin: 6px 0; background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; color: var(--text); box-sizing: border-box; font-size: 0.9rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.85rem; color: var(--text-muted); }
         .checkbox-group input { width: auto; margin: 0; }
-        button { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: 5px; }
-        button:hover { background: var(--accent-hover); }
-        button.stop { background: var(--danger); }
-        button.stop:hover { background: #dc2626; }
         
-        .bots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-        .bot-card { background: var(--card-bg); border-radius: 12px; padding: 18px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); position: relative; }
-        .bot-card h4 { margin: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center; color: #60a5fa; font-size: 1.1rem; }
-        .status-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 0.85rem; background: rgba(255,255,255,0.03); padding: 5px 8px; border-radius: 4px; }
-        .logs { background: #020617; border: 1px solid var(--border); padding: 8px; height: 110px; overflow-y: scroll; font-family: 'Courier New', Courier, monospace; font-size: 10px; border-radius: 6px; margin-top: 10px; }
-        .status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #334155; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        button { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
+        button.close-btn { background: #475569; }
+
+        /* Bot Kartları Izgarası */
+        .bots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .bot-card { background: var(--card-bg); border-radius: 12px; padding: 15px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
+        .bot-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px; }
+        .bot-header h4 { margin: 0; color: #60a5fa; font-size: 1rem; }
+        .status-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #334155; }
+
+        .info-row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 0.8rem; background: rgba(255,255,255,0.02); padding: 5px 8px; border-radius: 4px; }
+        
+        /* Radar ve Skorbord Yan Yana */
+        .panels-row { display: grid; grid-template-columns: 110px 1fr; gap: 10px; margin: 10px 0; }
+        .radar-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; }
+        canvas { width: 100px; height: 100px; background: #020617; border-radius: 4px; }
+        
+        .scoreboard-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 0.75rem; height: 100px; overflow-y: auto; }
+        .scoreboard-title { color: #facc15; font-weight: bold; text-align: center; border-bottom: 1px solid #1e293b; padding-bottom: 2px; margin-bottom: 4px; }
+
+        /* Terminal & Loglar */
+        .logs { background: #020617; border: 1px solid var(--border); padding: 8px; height: 90px; overflow-y: scroll; font-family: monospace; font-size: 10px; border-radius: 6px; margin-top: 8px; }
+        .terminal-input-group { display: flex; gap: 5px; margin-top: 8px; }
+        .terminal-input-group input { margin: 0; font-size: 0.8rem; padding: 6px; }
+        .terminal-input-group button { width: 70px; margin: 0; font-size: 0.8rem; padding: 6px; }
+        button.stop { background: var(--danger); margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>⚡ Minecraft Çoklu AFK Bot Paneli</h1>
-        <div class="badge">Aktif Bot Sayısı: <span id="totalBotsCount" style="color: #60a5fa;">0</span></div>
+        <h1>⚡ Minecraft AFK Paneli</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="badge">Bot: <span id="totalBotsCount" style="color: #60a5fa;">0</span></div>
+            <button class="btn-add" onclick="openModal()">+ Yeni Bot Ekle</button>
+        </div>
     </header>
 
-    <div class="main-layout">
-        <!-- Sol Taraf: Yeni Bot Ekleme Formu -->
-        <div class="card">
-            <h3>Yeni Bot Oluştur</h3>
-            <input type="text" id="botId" placeholder="Benzersiz Bot ID (Örn: bot1)" value="bot1">
+    <!-- Bot Ekleme Modal Penceresi -->
+    <div class="modal" id="botModal">
+        <div class="modal-content">
+            <h3>⚙️ Yeni Bot Ayarları</h3>
+            <input type="text" id="botId" placeholder="Bot ID (Örn: bot1)">
             <input type="text" id="host" placeholder="Sunucu IP Adresi" value="localhost">
             <input type="text" id="port" placeholder="Sunucu Port" value="25565">
-            <input type="text" id="username" placeholder="Bot Kullanıcı Adı" value="AFK_Bot_1">
-            <input type="text" id="version" placeholder="Minecraft Sürümü (Boş = Otomatik)">
-            <input type="text" id="loginCmd" placeholder="Login Komutu (Örn: /login 1234)">
+            <input type="text" id="username" placeholder="Bot Kullanıcı Adı" value="AFK_Player">
+            <input type="text" id="version" placeholder="Sürüm (Örn: 1.20.4 - Boş = Otomatik)">
+            <input type="text" id="loginCmd" placeholder="Login Komutu (Örn: /login sifre)">
             <input type="text" id="subServer" placeholder="Alt Sunucu Adı (/gir için)">
             
             <div class="checkbox-group">
                 <input type="checkbox" id="autoReconnect" checked>
-                <label for="autoReconnect">Oto Yeniden Bağlan</label>
+                <label for="autoReconnect">Bağlantı kopunca otomatik yeniden bağlan</label>
             </div>
 
-            <button onclick="startBot()">Botu Başlat & Ekle</button>
-        </div>
-
-        <!-- Sağ Taraf: Aktif Botların Kartları -->
-        <div>
-            <h2 style="margin-top: 0; font-size: 1.2rem; color: var(--text-muted);">Aktif Bot Kartları</h2>
-            <div id="botsContainer" class="bots-grid">
-                <p id="noBotsText" style="color: var(--text-muted); font-style: italic;">Şu anda çalışan bot bulunmuyor. Sol panelden bot ekleyin.</p>
+            <div class="modal-buttons">
+                <button class="close-btn" onclick="closeModal()">İptal</button>
+                <button onclick="startBot()">Bağlan</button>
             </div>
         </div>
+    </div>
+
+    <!-- Aktif Bot Kartları Alanı -->
+    <div id="botsContainer" class="bots-grid">
+        <p id="noBotsText" style="color: var(--text-muted); font-style: italic; text-align: center; grid-column: 1/-1; margin-top: 40px;">Henüz aktif bir bot bulunmuyor. Sağ üstteki "+ Yeni Bot Ekle" butonuna tıklayın.</p>
     </div>
 
     <script>
         const socket = io();
         const activeBots = {};
+
+        function openModal() { document.getElementById('botModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('botModal').style.display = 'none'; }
 
         function startBot() {
             const config = {
@@ -99,7 +125,7 @@
                 return;
             }
 
-            // Kart daha önce yoksa arayüze dinamik kart ekle
+            closeModal();
             createBotCard(config.id);
             socket.emit('start-bot', config);
         }
@@ -108,50 +134,84 @@
             socket.emit('stop-bot', id);
         }
 
+        function sendCommand(id) {
+            const inputEl = document.getElementById(`cmd-input-${id}`);
+            const command = inputEl.value.trim();
+            if (command) {
+                socket.emit('send-command', { id, command });
+                inputEl.value = '';
+            }
+        }
+
         function createBotCard(id) {
-            if (activeBots[id]) return; // Zaten varsa tekrar oluşturma
-            activeBots[id] = true;
+            if (activeBots[id]) return;
+            activeBots[id] = { x: 0, z: 0 };
 
             document.getElementById('noBotsText').style.display = 'none';
             const container = document.getElementById('botsContainer');
 
             const cardHTML = `
                 <div class="bot-card" id="card-${id}">
-                    <h4>
-                        <span>🤖 ${id}</span>
-                        <span class="status-badge" id="status-${id}">Başlatılıyor</span>
-                    </h4>
+                    <div class="bot-header">
+                        <h4>🤖 ${id}</h4>
+                        <span class="status-badge" id="status-${id}">Başlıyor</span>
+                    </div>
                     
-                    <div class="status-row">
+                    <div class="info-row">
                         <span>Uptime:</span>
                         <strong id="uptime-${id}" style="color: #38bdf8;">0s 0d 0sn</strong>
                     </div>
-                    <div class="status-row">
-                        <span>Radar (X, Y, Z):</span>
-                        <span id="radar-${id}">X: 0, Y: 0, Z: 0</span>
-                    </div>
-                    <div class="status-row">
-                        <span>Scoreboard:</span>
-                        <span id="score-${id}" style="color: #facc15;">Yok</span>
+                    <div class="info-row">
+                        <span>Koordinat:</span>
+                        <span id="coords-${id}">X: 0, Y: 0, Z: 0</span>
                     </div>
 
-                    <div class="logs" id="logs-${id}"><div>[Sistem] Bağlantı hazırlanıyor...</div></div>
+                    <!-- Radar ve Scoreboard Paneli -->
+                    <div class="panels-row">
+                        <div class="radar-box">
+                            <span style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">RADAR</span>
+                            <canvas id="radar-canvas-${id}" width="100" height="100"></canvas>
+                        </div>
+                        <div class="scoreboard-box">
+                            <div class="scoreboard-title" id="score-title-${id}">Skorbord</div>
+                            <div id="score-items-${id}" style="color: #cbd5e1;">Yükleniyor...</div>
+                        </div>
+                    </div>
+
+                    <div class="logs" id="logs-${id}"><div>[Sistem] Bağlantı başlatıldı...</div></div>
                     
+                    <!-- Terminal Komut Satırı -->
+                    <div class="terminal-input-group">
+                        <input type="text" id="cmd-input-${id}" placeholder="/gizli, /ah vb. komut yaz..." onkeydown="if(event.key==='Enter') sendCommand('${id}')">
+                        <button onclick="sendCommand('${id}')">Gönder</button>
+                    </div>
+
                     <button class="stop" onclick="stopBot('${id}')">Botu Durdur</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', cardHTML);
         }
 
-        function removeBotCard(id) {
-            const card = document.getElementById(`card-${id}`);
-            if (card) {
-                card.remove();
-                delete activeBots[id];
-            }
-            if (Object.keys(activeBots).length === 0) {
-                document.getElementById('noBotsTest').style.display = 'block';
-            }
+        // Radar Çizim Fonksiyonu
+        function drawRadar(id, x, z) {
+            const canvas = document.getElementById(`radar-canvas-${id}`);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 100, 100);
+
+            // Arka plan çizgileri
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(50, 0); ctx.lineTo(50, 100);
+            ctx.moveTo(0, 50); ctx.lineTo(100, 50);
+            ctx.stroke();
+
+            // Merkez nokta (Botun konumu)
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.arc(50, 50, 4, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         // Socket Dinleyicileri
@@ -166,9 +226,6 @@
                 badge.innerText = data.status;
                 badge.style.background = data.status === 'Oyunda' ? 'var(--success)' : (data.status === 'Bağlanıyor' ? '#eab308' : 'var(--danger)');
             }
-            if (data.status === 'Durduruldu' || data.status === 'Bağlantı Kesildi ve Kapatıldı') {
-                // İsteğe bağlı olarak kartı tamamen kaldırabilir veya durduruldu olarak bırakabilirsin
-            }
         });
 
         socket.on('bot-log', (data) => {
@@ -181,26 +238,31 @@
         });
 
         socket.on('bot-radar', (data) => {
-            const radarEl = document.getElementById(`radar-${data.id}`);
-            if (radarEl) {
-                radarEl.innerText = `X: ${data.position.x}, Y: ${data.position.y}, Z: ${data.position.z}`;
+            const coordEl = document.getElementById(`coords-${data.id}`);
+            if (coordEl) {
+                coordEl.innerText = `X: ${data.position.x}, Y: ${data.position.y}, Z: ${data.position.z}`;
+                drawRadar(data.id, data.position.x, data.position.z);
             }
         });
 
         socket.on('bot-scoreboard', (data) => {
-            const scoreEl = document.getElementById(`score-${data.id}`);
-            if (scoreEl) {
-                scoreEl.innerText = data.scoreboard.title;
+            const titleEl = document.getElementById(`score-title-${data.id}`);
+            const itemsEl = document.getElementById(`score-items-${data.id}`);
+            if (titleEl && itemsEl) {
+                titleEl.innerText = data.scoreboard.title;
+                if (data.scoreboard.items.length > 0) {
+                    itemsEl.innerHTML = data.scoreboard.items.join('<br>');
+                } else {
+                    itemsEl.innerHTML = '<span style="color: #64748b">Veri yok</span>';
+                }
             }
         });
 
         socket.on('stats-update', (data) => {
             for (const id in data.bots) {
-                if (activeBots[id]) {
-                    const uptimeEl = document.getElementById(`uptime-${id}`);
-                    if (uptimeEl) {
-                        uptimeEl.innerText = data.bots[id].uptime;
-                    }
+                const uptimeEl = document.getElementById(`uptime-${id}`);
+                if (uptimeEl) {
+                    uptimeEl.innerText = data.bots[id].uptime;
                 }
             }
         });
