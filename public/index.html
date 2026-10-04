@@ -10,9 +10,8 @@
             --bg-color: #0b0f19;
             --card-bg: #131b2e;
             --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --danger: #ef4444;
             --success: #22c55e;
+            --danger: #ef4444;
             --text: #f8fafc;
             --text-muted: #94a3b8;
             --border: #1e293b;
@@ -22,23 +21,21 @@
         h1 { margin: 0; font-size: 1.3rem; color: #60a5fa; }
         .badge { background: #1e293b; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid #334155; }
         
-        .btn-add { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; }
-        .btn-add:hover { background: #16a34a; }
-
-        /* Modal Ekranı */
+        .btn-add { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        
+        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px; box-sizing: border-box; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { margin-top: 0; color: #60a5fa; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
         input { width: 100%; padding: 10px; margin: 6px 0; background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; color: var(--text); box-sizing: border-box; font-size: 0.9rem; }
         .checkbox-group { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 0.85rem; color: var(--text-muted); }
         .checkbox-group input { width: auto; margin: 0; }
-        
         .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
         button { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; }
         button.close-btn { background: #475569; }
 
-        /* Bot Kartları Izgarası */
-        .bots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        /* Bot Kartları */
+        .bots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 15px; }
         .bot-card { background: var(--card-bg); border-radius: 12px; padding: 15px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }
         .bot-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 10px; }
         .bot-header h4 { margin: 0; color: #60a5fa; font-size: 1rem; }
@@ -46,17 +43,25 @@
 
         .info-row { display: flex; justify-content: space-between; margin: 5px 0; font-size: 0.8rem; background: rgba(255,255,255,0.02); padding: 5px 8px; border-radius: 4px; }
         
-        /* Radar ve Skorbord Yan Yana */
-        .panels-row { display: grid; grid-template-columns: 110px 1fr; gap: 10px; margin: 10px 0; }
+        /* Radar & Skorbord */
+        .panels-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin: 10px 0; }
         .radar-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; }
-        canvas { width: 100px; height: 100px; background: #020617; border-radius: 4px; }
+        canvas { width: 110px; height: 110px; background: #020617; border-radius: 4px; }
         
-        .scoreboard-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 0.75rem; height: 100px; overflow-y: auto; }
+        .scoreboard-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; font-size: 0.75rem; height: 120px; overflow-y: auto; }
         .scoreboard-title { color: #facc15; font-weight: bold; text-align: center; border-bottom: 1px solid #1e293b; padding-bottom: 2px; margin-bottom: 4px; }
 
-        /* Terminal & Loglar */
-        .logs { background: #020617; border: 1px solid var(--border); padding: 8px; height: 90px; overflow-y: scroll; font-family: monospace; font-size: 10px; border-radius: 6px; margin-top: 8px; }
-        .terminal-input-group { display: flex; gap: 5px; margin-top: 8px; }
+        /* Tab ve Envanter Bölümleri */
+        .section-title { font-size: 0.85rem; color: #60a5fa; margin: 10px 0 4px 0; font-weight: bold; border-top: 1px solid var(--border); padding-top: 6px; }
+        .tab-list-box { background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; padding: 6px; max-height: 100px; overflow-y: auto; font-size: 0.75rem; }
+        .tab-row { display: flex; justify-content: space-between; padding: 2px 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        .inventory-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #0b0f19; padding: 4px; border-radius: 6px; border: 1px solid var(--border); margin-top: 5px; }
+        .inv-slot { background: #1e293b; aspect-ratio: 1; border-radius: 2px; font-size: 9px; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+
+        /* Terminal */
+        .logs { background: #020617; border: 1px solid var(--border); padding: 8px; height: 80px; overflow-y: scroll; font-family: monospace; font-size: 10px; border-radius: 6px; margin-top: 8px; }
+        .terminal-input-group { display: flex; gap: 5px; margin-top: 6px; }
         .terminal-input-group input { margin: 0; font-size: 0.8rem; padding: 6px; }
         .terminal-input-group button { width: 70px; margin: 0; font-size: 0.8rem; padding: 6px; }
         button.stop { background: var(--danger); margin-top: 10px; }
@@ -72,21 +77,21 @@
         </div>
     </header>
 
-    <!-- Bot Ekleme Modal Penceresi -->
+    <!-- Modal -->
     <div class="modal" id="botModal">
         <div class="modal-content">
             <h3>⚙️ Yeni Bot Ayarları</h3>
             <input type="text" id="botId" placeholder="Bot ID (Örn: bot1)">
-            <input type="text" id="host" placeholder="Sunucu IP Adresi" value="localhost">
+            <input type="text" id="host" placeholder="Sunucu IP Adresi" value="oyna.aesirmc.com">
             <input type="text" id="port" placeholder="Sunucu Port" value="25565">
-            <input type="text" id="username" placeholder="Bot Kullanıcı Adı" value="AFK_Player">
-            <input type="text" id="version" placeholder="Sürüm (Örn: 1.20.4 - Boş = Otomatik)">
+            <input type="text" id="username" placeholder="Bot Kullanıcı Adı" value="AFK_Bot">
+            <input type="text" id="version" placeholder="Sürüm (Örn: 1.20.4)" value="1.20.4">
             <input type="text" id="loginCmd" placeholder="Login Komutu (Örn: /login sifre)">
             <input type="text" id="subServer" placeholder="Alt Sunucu Adı (/gir için)">
             
             <div class="checkbox-group">
                 <input type="checkbox" id="autoReconnect" checked>
-                <label for="autoReconnect">Bağlantı kopunca otomatik yeniden bağlan</label>
+                <label for="autoReconnect">Oto Yeniden Bağlan</label>
             </div>
 
             <div class="modal-buttons">
@@ -96,9 +101,8 @@
         </div>
     </div>
 
-    <!-- Aktif Bot Kartları Alanı -->
     <div id="botsContainer" class="bots-grid">
-        <p id="noBotsText" style="color: var(--text-muted); font-style: italic; text-align: center; grid-column: 1/-1; margin-top: 40px;">Henüz aktif bir bot bulunmuyor. Sağ üstteki "+ Yeni Bot Ekle" butonuna tıklayın.</p>
+        <p id="noBotsText" style="color: var(--text-muted); font-style: italic; text-align: center; grid-column: 1/-1; margin-top: 40px;">Henüz aktif bot yok. Sağ üstten ekleyin.</p>
     </div>
 
     <script>
@@ -121,7 +125,7 @@
             };
 
             if (!config.id || !config.username) {
-                alert('Lütfen Bot ID ve Kullanıcı Adı alanlarını doldurun!');
+                alert('Bot ID ve Kullanıcı Adı zorunludur!');
                 return;
             }
 
@@ -130,9 +134,7 @@
             socket.emit('start-bot', config);
         }
 
-        function stopBot(id) {
-            socket.emit('stop-bot', id);
-        }
+        function stopBot(id) { socket.emit('stop-bot', id); }
 
         function sendCommand(id) {
             const inputEl = document.getElementById(`cmd-input-${id}`);
@@ -145,7 +147,7 @@
 
         function createBotCard(id) {
             if (activeBots[id]) return;
-            activeBots[id] = { x: 0, z: 0 };
+            activeBots[id] = true;
 
             document.getElementById('noBotsText').style.display = 'none';
             const container = document.getElementById('botsContainer');
@@ -166,11 +168,11 @@
                         <span id="coords-${id}">X: 0, Y: 0, Z: 0</span>
                     </div>
 
-                    <!-- Radar ve Scoreboard Paneli -->
+                    <!-- Radar ve Skorbord -->
                     <div class="panels-row">
                         <div class="radar-box">
                             <span style="font-size: 9px; color: #94a3b8; margin-bottom: 2px;">RADAR</span>
-                            <canvas id="radar-canvas-${id}" width="100" height="100"></canvas>
+                            <canvas id="radar-canvas-${id}" width="110" height="110"></canvas>
                         </div>
                         <div class="scoreboard-box">
                             <div class="scoreboard-title" id="score-title-${id}">Skorbord</div>
@@ -178,11 +180,22 @@
                         </div>
                     </div>
 
+                    <!-- Tab Oyuncu Listesi -->
+                    <div class="section-title">Tab Oyuncu Listesi</div>
+                    <div class="tab-list-box" id="tablist-${id}">
+                        <div style="color: #64748b; text-align: center;">Yükleniyor...</div>
+                    </div>
+
+                    <!-- Bot Envanteri Görüntüleme -->
+                    <div class="section-title">Bot Envanteri</div>
+                    <div class="inventory-grid" id="inv-${id}">
+                        ${Array.from({length: 27}, () => `<div class="inv-slot">-</div>`).join('')}
+                    </div>
+
                     <div class="logs" id="logs-${id}"><div>[Sistem] Bağlantı başlatıldı...</div></div>
                     
-                    <!-- Terminal Komut Satırı -->
                     <div class="terminal-input-group">
-                        <input type="text" id="cmd-input-${id}" placeholder="/gizli, /ah vb. komut yaz..." onkeydown="if(event.key==='Enter') sendCommand('${id}')">
+                        <input type="text" id="cmd-input-${id}" placeholder="/gir survival vb. komut yaz..." onkeydown="if(event.key==='Enter') sendCommand('${id}')">
                         <button onclick="sendCommand('${id}')">Gönder</button>
                     </div>
 
@@ -192,32 +205,29 @@
             container.insertAdjacentHTML('beforeend', cardHTML);
         }
 
-        // Radar Çizim Fonksiyonu
-        function drawRadar(id, x, z) {
+        function drawRadar(id, x, z, players) {
             const canvas = document.getElementById(`radar-canvas-${id}`);
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, 100, 100);
+            ctx.clearRect(0, 0, 110, 110);
 
-            // Arka plan çizgileri
+            // Çizgiler
             ctx.strokeStyle = '#1e293b';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(50, 0); ctx.lineTo(50, 100);
-            ctx.moveTo(0, 50); ctx.lineTo(100, 50);
+            ctx.moveTo(55, 0); ctx.lineTo(55, 110);
+            ctx.moveTo(0, 55); ctx.lineTo(110, 55);
             ctx.stroke();
 
-            // Merkez nokta (Botun konumu)
+            // Bot (Yeşil merkez nokta)
             ctx.fillStyle = '#22c55e';
             ctx.beginPath();
-            ctx.arc(50, 50, 4, 0, Math.PI * 2);
+            ctx.arc(55, 55, 4, 0, Math.PI * 2);
             ctx.fill();
         }
 
         // Socket Dinleyicileri
-        socket.on('total-bots', (count) => {
-            document.getElementById('totalBotsCount').innerText = count;
-        });
+        socket.on('total-bots', (count) => { document.getElementById('totalBotsCount').innerText = count; });
 
         socket.on('bot-status', (data) => {
             createBotCard(data.id);
@@ -241,7 +251,26 @@
             const coordEl = document.getElementById(`coords-${data.id}`);
             if (coordEl) {
                 coordEl.innerText = `X: ${data.position.x}, Y: ${data.position.y}, Z: ${data.position.z}`;
-                drawRadar(data.id, data.position.x, data.position.z);
+                drawRadar(data.id, data.position.x, data.position.z, data.players);
+            }
+        });
+
+        socket.on('bot-tablist', (data) => {
+            const tabEl = document.getElementById(`tablist-${data.id}`);
+            if (tabEl && data.tabList) {
+                tabEl.innerHTML = data.tabList.map(p => `<div class="tab-row"><span>${p.name}</span><span style="color:#22c55e">${p.ping}ms</span></div>`).join('');
+            }
+        });
+
+        socket.on('bot-inventory', (data) => {
+            const invEl = document.getElementById(`inv-${data.id}`);
+            if (invEl && data.inventory) {
+                let html = '';
+                for (let i = 9; i < 36; i++) { // Ana envanter slotları
+                    const item = data.inventory[i];
+                    html += `<div class="inv-slot" title="${item ? item.name : 'Boş'}">${item ? item.count : ''}</div>`;
+                }
+                invEl.innerHTML = html;
             }
         });
 
@@ -250,20 +279,14 @@
             const itemsEl = document.getElementById(`score-items-${data.id}`);
             if (titleEl && itemsEl) {
                 titleEl.innerText = data.scoreboard.title;
-                if (data.scoreboard.items.length > 0) {
-                    itemsEl.innerHTML = data.scoreboard.items.join('<br>');
-                } else {
-                    itemsEl.innerHTML = '<span style="color: #64748b">Veri yok</span>';
-                }
+                itemsEl.innerHTML = data.scoreboard.items.length > 0 ? data.scoreboard.items.join('<br>') : '<span style="color:#64748b">Veri yok</span>';
             }
         });
 
         socket.on('stats-update', (data) => {
             for (const id in data.bots) {
                 const uptimeEl = document.getElementById(`uptime-${id}`);
-                if (uptimeEl) {
-                    uptimeEl.innerText = data.bots[id].uptime;
-                }
+                if (uptimeEl) uptimeEl.innerText = data.bots[id].uptime;
             }
         });
     </script>
